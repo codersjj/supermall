@@ -63,7 +63,7 @@ export default {
 }
 </script>
 
-<style>
+<style scoped>
   .tab-bar-item {
     flex: 1;
     /* 移动端开发中，tabbar 的高度通常设为 49px */
