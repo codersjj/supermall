@@ -37,28 +37,41 @@ export default {
     // console.log(this.scroll);
 
     // 2. 监听滚动的位置
-    this.scroll.on('scroll', position => {
-      // console.log(position);
-      this.$emit('scroll', position)
-    })
+    if (this.probeType > 0) {
+      this.scroll.on('scroll', position => {
+        // console.log(position);
+        this.$emit('scroll', position)
+      })
+    }
 
+    // 3. 监听上拉事件
     if (this.pullUpLoad) {
-      // 3. 监听上拉事件
       this.scroll.on('pullingUp', () => {
-        console.log('pullingUp');
+        // console.log('pullingUp');
         this.$emit('pullingUp')
       })
 
     }
+
+    // console.log(this.scroll);
   },
   methods: {
     scrollTo(x, y, time = 500) {
-      this.scroll.scrollTo(x, y, time);
+      this.scroll && this.scroll.scrollTo(x, y, time);
     },
     finishPullUp() {
-      if (this.pullUpLoad) {
-        this.scroll.finishPullUp()
-      }
+      // if (this.pullUpLoad) {
+        this.scroll && this.scroll.finishPullUp()
+      // }
+    },
+    refresh() {
+      console.log('我刷');
+      // 由于这里的 this.scroll 是在 mounted() 中初始化的，可能会出现外部调用本方法时，this.scroll 还没初始化完成的情况，即此时的 this.scroll 可能为 null 或 undefined，因此最好先判断 this.scroll 是否存在
+      this.scroll && this.scroll.refresh()
+    },
+    getScrollY() {
+      // console.log(this.scroll.y);
+      return this.scroll ? this.scroll.y : 0
     }
   }
 }

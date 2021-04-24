@@ -1,6 +1,11 @@
 <template>
-  <div class="goods-item">
-    <img :src="goodsItem.show.img" alt="">
+  <div class="goods-item" @click="itemClick">
+    <!-- 
+      使用 Vue 提供的 load 事件监听每一张图片是否加载完成，一旦图片加载完就会执行 load 对应的方法（这里即 imageLoaded），
+      再在 load 事件对应的方法中执行 BetterScroll 的 refresh 方法，重新计算可滚动的高度。
+      @load 实现的是 js 原生的 GlobalEventHandlers.onload 属性这一事件处理程序（这里即 img.onload = function() {}）
+    -->
+    <img :src="goodsItem.show.img" alt="" @load="imageLoaded">
     <div class="goods-info">
       <p>{{goodsItem.title}}</p>
       <span class="price">{{goodsItem.price}}</span>
@@ -18,6 +23,17 @@ export default {
       default() {
         return {}
       }
+    }
+  },
+  methods: {
+    imageLoaded() {
+      console.log('imageLoaded');
+      // 使用事件总线发出事件
+      this.$bus.$emit('itemImageLoaded')
+    },
+    itemClick() {
+      // console.log('详情');
+      this.$router.push(`/detail/${this.goodsItem.iid}`)
     }
   }
 }
