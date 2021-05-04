@@ -150,6 +150,7 @@ import FeatureView from './childComps/FeatureView'
 /* 方法等其它内容 */
 import { getHomeMultidata, getHomeGoods } from 'network/home'
 import { debounce } from 'common/utils'
+import { itemListenerMixin } from 'common/mixin'
 
 export default {
   components: {
@@ -163,6 +164,7 @@ export default {
     Scroll,
     BackTop
   },
+  mixins: [itemListenerMixin],
   data() {
     return {
       banners: [],
@@ -185,7 +187,8 @@ export default {
       isShowBackToTop: false,
       tabOffsetTop: 0,
       isTabFixed: false,
-      saveY: 0
+      saveY: 0,
+      // itemImgListener: null
     }
   },
   computed: {
@@ -214,12 +217,14 @@ export default {
       // 执行 BetterScroll 的 refresh 方法，重新计算可滚动的高度。
       this.$refs.scroll && this.$refs.scroll.refresh()
     }) */
-    // 使用防抖函数
+    /* // 使用防抖函数
     const refresh = debounce(this.$refs.scroll.refresh, 50)
-    this.$bus.$on('itemImageLoaded', () => {
+    // 对监听到事件后要执行的函数进行保存
+    this.itemImgListener = () => {
       // console.log('---');
       refresh()
-    })
+    }
+    this.$bus.$on('itemImageLoaded', this.itemImgListener) */
     /* const that = this
     this.$bus.$on('itemImageLoaded', function () {
       // 执行 BetterScroll 的 refresh 方法，重新计算可滚动的高度。
@@ -237,8 +242,12 @@ export default {
   },
   deactivated() {
     console.log('deactivated', this.$refs.scroll.getScrollY());
-    // 离开首页时，保存当前位置（y轴坐标）
+    // 1. 离开首页时，保存当前位置（y轴坐标）
     this.saveY = this.$refs.scroll.getScrollY()
+    // 2. 离开首页时，取消全局事件的监听
+    // this.$bus.$off('itemImageLoaded') // 只传事件名称会将所有地方的这个事件监听都取消掉
+    // 我们这里只需要取消掉和这个事件关联的某一个函数就可以了
+    this.$bus.$off('itemImageLoaded', this.itemImgListener)
   },
   methods: {
     /**

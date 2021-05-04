@@ -5,7 +5,7 @@
       再在 load 事件对应的方法中执行 BetterScroll 的 refresh 方法，重新计算可滚动的高度。
       @load 实现的是 js 原生的 GlobalEventHandlers.onload 属性这一事件处理程序（这里即 img.onload = function() {}）
     -->
-    <img :src="goodsItem.show.img" alt="" @load="imageLoaded">
+    <img :src="showGoodsImg" alt="" @load="imageLoaded">
     <div class="goods-info">
       <p>{{goodsItem.title}}</p>
       <span class="price">{{goodsItem.price}}</span>
@@ -25,15 +25,35 @@ export default {
       }
     }
   },
+  computed: {
+    showGoodsImg() {
+      return this.goodsItem.image || this.goodsItem.show.img
+    }
+  },
   methods: {
     imageLoaded() {
       console.log('imageLoaded');
       // 使用事件总线发出事件
       this.$bus.$emit('itemImageLoaded')
+      /* // 根据路由来判断应该发出的事件
+      if (this.$route.path.indexOf('/home') !== -1) {
+        // 使用事件总线发出事件
+        this.$bus.$emit('homeImageLoaded')
+      } else if (this.$route.path.indexOf('/detail') !== -1) {
+        this.$bus.$emit('detailImageLoaded')
+      } */
     },
     itemClick() {
       // console.log('详情');
-      this.$router.push(`/detail/${this.goodsItem.iid}`)
+      // 方式一：动态路由
+      // this.$router.push(`/detail/${this.goodsItem.iid}`)
+      // 方式二：query
+      this.$router.push({
+        path: '/detail',
+        query: {
+          iid: this.goodsItem.iid
+        }
+      })
     }
   }
 }
